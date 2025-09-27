@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>CSC Career Test</title>
+<style>
+ body {
+  font-family: Tajawal, sans-serif;
+  background: #eff4f1;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  min-height: 100vh;      
+}
+
+.container {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  max-width: 700px;
+  width: 100%;
+}
+  h1{text-align:center; color:#333;}
+  .card{padding:20px; border-radius:12px; margin-bottom:20px; background:#ffffff; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+  .question h3{margin-bottom:15px; color:#333;}
+  label{display:block; margin:8px 0; padding:10px; border:1px solid #98b8a6; border-radius:8px; cursor:pointer; transition:0.3s;}
+  label:hover{background:#eff4f1;}
+  input[type="radio"]{margin-left:10px;}
+  .result{padding:20px; border-radius:12px; background:#eff4f1; text-align:center;}
+  .tag{display:inline-block; padding:6px 12px; margin:3px; border-radius:6px; background:#98b8a6; color:#fff; font-size:14px;}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>اختبار مهن الأمن السيبراني</h1>
+
+<div id="quiz"></div>
+
+<div class="card result" id="resultCard" style="display:none;">
+  <div id="tags"></div>
+  <h2 id="resTitle"></h2>
+  <p id="resDesc"></p>
+  <div id="details"></div>
+</div>
+</div>
+
+<script>
+const questions = [
+  {q:"عندما تفكر في الأمن السيبراني، ما الذي يجذبك أكثر؟", opts:[
+    {text:"اكتشاف الثغرات", val:"offensive"},
+    {text:"حماية الأنظمة", val:"defensive"},
+    {text:"التحقيق في الحوادث", val:"incident"},
+    {text:"وضع السياسات", val:"governance"}
+  ]},
+  {q:"أي نشاط يبدو أكثر إثارة لك؟", opts:[
+    {text:"اختبار الأنظمة بحثًا عن ثغرات", val:"offensive"},
+    {text:"بناء أنظمة دفاعية قوية", val:"defensive"},
+    {text:"تحليل الاختراقات الأمنية", val:"incident"},
+    {text:"تطوير استراتيجيات للأمن", val:"governance"}
+  ]},
+  {q:"في موقف أمني، أي دور يناسبك أكثر؟", opts:[
+    {text:"التفكير كالمهاجم لتوقع الهجمات", val:"offensive"},
+    {text:"متابعة الأنظمة والتأكد من سلامتها", val:"defensive"},
+    {text:"قيادة التعامل مع الحوادث الأمنية", val:"incident"},
+    {text:"التأكد من الالتزام بالمعايير", val:"governance"}
+  ]},
+  {q:"أي وصف يعبر عنك أكثر؟", opts:[
+    {text:"أحب حل الألغاز واكتشاف المشكلات الخفية", val:"offensive"},
+    {text:"دقيق وأركز على منع المشاكل قبل وقوعها", val:"defensive"},
+    {text:"أتحلى بالهدوء عند الأزمات وأجيد التحقيق", val:"incident"},
+    {text:"أتميز في التنظيم ووضع الإجراءات", val:"governance"}
+  ]},
+  {q:"أي نوع من بيئات العمل تفضل؟", opts:[
+    {text:"متغيرة ومليئة بالتحديات", val:"offensive"},
+    {text:"منظمة وواضحة الإجراءات", val:"defensive"},
+    {text:"سريعة الإيقاع وتتطلب متابعة مستمرة", val:"incident"},
+    {text:"استراتيجية وتعاونية", val:"governance"}
+  ]},
+  {q:"أي مهارة ترغب في تطويرها أكثر؟", opts:[
+    {text:"الاختراق الأخلاقي وتجربة أنظمة جديدة", val:"offensive"},
+    {text:"حماية الشبكات وتقوية الأنظمة", val:"defensive"},
+    {text:"تحليل الأدلة الرقمية وفحص البرمجيات", val:"incident"},
+    {text:"تقييم المخاطر والامتثال للمعايير", val:"governance"}
+  ]},
+  {q:"في مشروع جماعي، أي أسلوب تتبعه عادة؟", opts:[
+    {text:"أبحث عن المشكلات والضعف المحتمل", val:"offensive"},
+    {text:"أطبق التدابير الوقائية", val:"defensive"},
+    {text:"أتعامل مع المفاجآت والمشكلات الطارئة", val:"incident"},
+    {text:"أضع الإرشادات وأتابع تنفيذها", val:"governance"}
+  ]},
+  {q:"ما أكثر ما يثير اهتمامك في التكنولوجيا؟", opts:[
+    {text:"معرفة كيف يمكن استغلال الأنظمة", val:"offensive"},
+    {text:"متابعة أدوات وتقنيات الأمان الجديدة", val:"defensive"},
+    {text:"التحقيق في الحوادث واستخلاص الدروس", val:"incident"},
+    {text:"إدارة وتحسين الإجراءات الأمنية", val:"governance"}
+  ]},
+  {q:"أي إنجاز يجعلك تشعر بالفخر؟", opts:[
+    {text:"اكتشاف ثغرة حرجة قبل استغلالها", val:"offensive"},
+    {text:"منع خرق أمني كبير", val:"defensive"},
+    {text:"حل حادثة أمنية معقدة", val:"incident"},
+    {text:"تنفيذ برنامج أمني شامل", val:"governance"}
+  ]},
+  {q:"كيف تفضل تعلم أشياء جديدة؟", opts:[
+    {text:"عبر التجربة العملية والتجارب", val:"offensive"},
+    {text:"عبر دراسة الممارسات المثبتة", val:"defensive"},
+    {text:"عبر دراسة حالات واقعية", val:"incident"},
+    {text:"بفهم الأطر والمنهجيات", val:"governance"}
+  ]}
+];
+
+const PATHS = {
+  offensive:{tag:'🐞 هجومي',title:'الأمن الهجومي',desc:'تفكر مثل المهاجم وتستمتع باكتشاف الثغرات.',tips:'يمكنك استكشاف الاختبارات الاختراقية وتعلم أدوات مثل Metasploit.'},
+  defensive:{tag:'🛡️ دفاعي',title:'الأمن الدفاعي',desc:'تحب الحماية والوقاية وبناء أنظمة قوية.',tips:'خذلك نظرة على SEIM Platforms.'},
+  incident:{tag:'🔍 استجابة للحوادث',title:'استجابة الحوادث',desc:'تحب التحقيق والتحليل عند وقوع مشكلات.',tips:'ادرس التحليل الجنائي الرقمي وتدريباتDFIR.'},
+  governance:{tag:'📋 حوكمة',title:'الحوكمة والامتثال',desc:'تركز على السياسات والإجراءات.',tips:'تعلم عن معايير ISO وNIST وتقييم المخاطر.'}
+};
+
+const quizEl = document.getElementById('quiz');
+const tagsEl = document.getElementById('tags');
+const titleEl = document.getElementById('resTitle');
+const descEl = document.getElementById('resDesc');
+const detailsContent = document.getElementById('details');
+
+let current = 0;
+let answers = {};
+
+function showQuestion(index){
+  quizEl.innerHTML = '';
+  const q = questions[index];
+  const card = document.createElement('div');
+  card.className = 'card question';
+  let html = `<h3>${index+1}. ${q.q}</h3>`;
+  q.opts.forEach(opt=>{
+    html += `<label><input type="radio" name="q${index}" value="${opt.val}"> ${opt.text}</label>`;
+  });
+  card.innerHTML = html;
+  quizEl.appendChild(card);
+
+  // auto next on change
+  const inputs = card.querySelectorAll('input[type="radio"]');
+  inputs.forEach(inp=>{
+    inp.addEventListener('change', e=>{
+      answers['q'+(index+1)] = e.target.value;
+      current++;
+      if(current < questions.length) showQuestion(current);
+      else showResult();
+    });
+  });
+}
+
+function showResult(){
+  quizEl.style.display='none';
+  let tally = {offensive:0,defensive:0,incident:0,governance:0};
+  Object.values(answers).forEach(v=>{ if(tally[v]!==undefined) tally[v]++; });
+
+  let max = Math.max(...Object.values(tally));
+  let winners = Object.keys(tally).filter(k=>tally[k]===max && max>0);
+
+  tagsEl.innerHTML=''; titleEl.textContent=''; descEl.innerHTML=''; detailsContent.innerHTML='';
+
+  winners.forEach(w=>{
+    const span = document.createElement('span');
+    span.className='tag';
+    span.textContent = PATHS[w].tag;
+    tagsEl.appendChild(span);
+  });
+
+  if(winners.length===1){
+    const key=winners[0];
+    titleEl.textContent=PATHS[key].title;
+    descEl.innerHTML=PATHS[key].desc;
+    detailsContent.innerHTML=PATHS[key].tips;
+  } else if(winners.length>1){
+    titleEl.textContent='نتيجة متقاربة – عدة مسارات ممكنة';
+    descEl.innerHTML = winners.map(k=>'<strong>'+PATHS[k].title+'</strong>: '+PATHS[k].desc).join('<br><br>');
+    detailsContent.innerHTML = winners.map(k=>'<strong>'+PATHS[k].title+'</strong><br>'+PATHS[k].tips).join('<hr style="border:none;border-top:1px dashed rgba(0,0,0,0.2);margin:10px 0">');
+  } else {
+    titleEl.textContent='الرجاء إعادة الاختبار لتحديد ميولك بدقة';
+  }
+
+  document.getElementById('resultCard').style.display='block';
+}
+
+showQuestion(current);
+</script>
+</body>
+</html>
